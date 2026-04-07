@@ -33,7 +33,7 @@ const LEVEL_RULES = {
 
 function ExplainConceptPage() {
   const [concept, setConcept] = useState('')
-  const [level, setLevel] = useState('Beginner')
+  const [level, setLevel] = useState('Intermediate')
   const [generatedExplanation, setGeneratedExplanation] = useState(null)
   const [expandedQuickCheck, setExpandedQuickCheck] = useState(null)
   const [error, setError] = useState('')
@@ -337,6 +337,50 @@ function ExplainConceptPage() {
 
     const programmingTopic = isProgrammingConcept(concept)
     const leetcodeSuggestion = programmingTopic ? getLeetcodeSuggestion(concept) : null
+
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+    const parseRetryMs = (message) => {
+      const match = message.match(/try again in\s*([\d.]+)s/i)
+      if (!match) {
+        return 0
+      }
+
+      const seconds = Number(match[1])
+      if (!Number.isFinite(seconds) || seconds <= 0) {
+        return 0
+      }
+
+      return Math.ceil(seconds * 1000)
+    }
+
+    const fetchGroqWithRetry = async (payload, retryCount = 1) => {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (response.ok) {
+        return response
+      }
+
+      const errorPayload = await response.json().catch(() => null)
+      const apiMessage = errorPayload?.error?.message || `Concept explanation failed (${response.status})`
+
+      if (response.status === 429 && retryCount > 0) {
+        const retryMs = parseRetryMs(apiMessage)
+        if (retryMs > 0) {
+          await wait(retryMs)
+          return fetchGroqWithRetry(payload, retryCount - 1)
+        }
+      }
+
+      throw new Error(apiMessage)
+    }
     const levelRule = LEVEL_RULES[level] || LEVEL_RULES.Beginner
 
     const hasLevelDepth = (result) => {
@@ -370,35 +414,22 @@ function ExplainConceptPage() {
     const userPrompt = `${programmingTopic ? 'This is a programming/data-structures/algorithms topic.' : 'This is a general academic topic.'} Explain the concept "${concept.trim()}" for a ${level.toLowerCase()} learner. Include a complete and detailed study explanation, not a short summary. ${programmingTopic && leetcodeSuggestion ? `Use this LeetCode problem for the suggestion: ${leetcodeSuggestion.problem} (${leetcodeSuggestion.url}). Include a sample code snippet that illustrates the concept.` : 'Do not include a LeetCode practice problem or sample code.'} For quickCheck, return question/answer pairs that can be tapped to reveal the answer.`
 
     const requestExplanation = async (strictMode) => {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          temperature: strictMode ? 0.2 : 0.25,
-          max_tokens: 3800,
-          response_format: { type: 'json_object' },
-          messages: [
-            {
-              role: 'system',
-              content: buildSystemPrompt(strictMode),
-            },
-            {
-              role: 'user',
-              content: userPrompt,
-            },
-          ],
-        }),
+      const response = await fetchGroqWithRetry({
+        model: MODEL,
+        temperature: strictMode ? 0.2 : 0.25,
+        max_tokens: strictMode ? 1600 : 1100,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content: buildSystemPrompt(strictMode),
+          },
+          {
+            role: 'user',
+            content: userPrompt,
+          },
+        ],
       })
-
-      if (!response.ok) {
-        const errorPayload = await response.json().catch(() => null)
-        const apiMessage = errorPayload?.error?.message || `Concept explanation failed (${response.status})`
-        throw new Error(apiMessage)
-      }
 
       const data = await response.json()
       const rawText = data?.choices?.[0]?.message?.content?.trim()
@@ -411,34 +442,23 @@ function ExplainConceptPage() {
     }
 
     const repairExplanationJson = async (brokenJson) => {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          temperature: 0,
-          max_tokens: 3800,
-          response_format: { type: 'json_object' },
-          messages: [
-            {
-              role: 'system',
-              content:
-                'You repair malformed JSON. Return ONLY valid JSON and keep the same meaning/content. Output must follow this exact schema: {"title":"string","overview":"string","simpleBreakdown":["string"],"realWorldExample":"string","analogy":"string","formulaOrRule":"string","commonMistakes":["string"],"quickCheck":[{"question":"string","answer":"string"}],"studyTip":"string","suggestedLeetcodeProblem":"string","suggestedLeetcodeUrl":"string","sampleCode":"string"}. Do not add markdown or comments.',
-            },
-            {
-              role: 'user',
-              content: `Repair this malformed JSON:\n${brokenJson}`,
-            },
-          ],
-        }),
+      const response = await fetchGroqWithRetry({
+        model: MODEL,
+        temperature: 0,
+        max_tokens: 1200,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You repair malformed JSON. Return ONLY valid JSON and keep the same meaning/content. Output must follow this exact schema: {"title":"string","overview":"string","simpleBreakdown":["string"],"realWorldExample":"string","analogy":"string","formulaOrRule":"string","commonMistakes":["string"],"quickCheck":[{"question":"string","answer":"string"}],"studyTip":"string","suggestedLeetcodeProblem":"string","suggestedLeetcodeUrl":"string","sampleCode":"string"}. Do not add markdown or comments.',
+          },
+          {
+            role: 'user',
+            content: `Repair this malformed JSON:\n${brokenJson}`,
+          },
+        ],
       })
-
-      if (!response.ok) {
-        throw new Error('Could not repair malformed explanation JSON.')
-      }
 
       const data = await response.json()
       const repairedRaw = data?.choices?.[0]?.message?.content?.trim()
@@ -564,7 +584,6 @@ function ExplainConceptPage() {
                 onChange={(event) => setLevel(event.target.value)}
                 className="mt-2 w-full rounded-xl border border-white/15 bg-slate-900/80 px-3 py-2 text-sm text-slate-100 outline-none"
               >
-                <option>Beginner</option>
                 <option>Intermediate</option>
                 <option>Advanced</option>
               </select>

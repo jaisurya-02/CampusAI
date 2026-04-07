@@ -216,7 +216,7 @@ function GenerateNotesPage() {
       body: JSON.stringify({
         model: MODEL,
         temperature: 0.2,
-        max_tokens: 2200,
+          max_tokens: 1600,
         messages: [
           {
             role: 'system',
