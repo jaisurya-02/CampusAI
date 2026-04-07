@@ -218,13 +218,13 @@ function StudyAssistantPage() {
               <Lightbulb size={15} className="text-violet-300" />
               Explain Concept
             </Link>
-            <button
-              type="button"
+            <Link
+              to="/flashcard-mode"
               className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-100 transition duration-300 hover:border-cyan-300/45"
             >
               <Brain size={15} className="text-cyan-300" />
               Flashcard Mode
-            </button>
+            </Link>
           </div>
         </section>
       </main>

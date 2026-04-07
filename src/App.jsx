@@ -15,6 +15,7 @@ import StudyAssistantPage from './pages/StudyAssistant.jsx'
 import GenerateNotesPage from './pages/GenerateNotes.jsx'
 import MockTestGeneratorPage from './pages/MockTestGenerator.jsx'
 import ExplainConceptPage from './pages/ExplainConcept.jsx'
+import FlashcardModePage from './pages/FlashcardMode.jsx'
 import ComplaintSupportPage from './pages/ComplaintSupport.jsx'
 import OpportunityHubPage from './pages/OpportunityHub.jsx'
 import DashboardPage from './pages/Dashboard.jsx'
@@ -448,6 +449,7 @@ function App() {
           <Route path="/generate-notes" element={<GenerateNotesPage />} />
           <Route path="/mock-test" element={<MockTestGeneratorPage />} />
           <Route path="/explain-concept" element={<ExplainConceptPage />} />
+          <Route path="/flashcard-mode" element={<FlashcardModePage />} />
           <Route path="/complaint-support" element={<ComplaintSupportPage />} />
           <Route path="/opportunity-hub" element={<OpportunityHubPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
