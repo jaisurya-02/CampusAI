@@ -204,20 +204,20 @@ function StudyAssistantPage() {
               <BookOpenCheck size={15} className="text-cyan-300" />
               Generate Notes
             </Link>
-            <button
-              type="button"
+            <Link
+              to="/mock-test"
               className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-100 transition duration-300 hover:border-cyan-300/45"
             >
               <GraduationCap size={15} className="text-indigo-300" />
               Mock Test
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              to="/explain-concept"
               className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-100 transition duration-300 hover:border-cyan-300/45"
             >
               <Lightbulb size={15} className="text-violet-300" />
               Explain Concept
-            </button>
+            </Link>
             <button
               type="button"
               className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-slate-100 transition duration-300 hover:border-cyan-300/45"

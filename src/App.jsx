@@ -13,6 +13,8 @@ import { Navigate, Route, Routes, Link, useLocation } from 'react-router-dom'
 import EventFinderPage from './pages/EventFinder.jsx'
 import StudyAssistantPage from './pages/StudyAssistant.jsx'
 import GenerateNotesPage from './pages/GenerateNotes.jsx'
+import MockTestGeneratorPage from './pages/MockTestGenerator.jsx'
+import ExplainConceptPage from './pages/ExplainConcept.jsx'
 import ComplaintSupportPage from './pages/ComplaintSupport.jsx'
 import OpportunityHubPage from './pages/OpportunityHub.jsx'
 import DashboardPage from './pages/Dashboard.jsx'
@@ -444,6 +446,8 @@ function App() {
           <Route path="/event-finder" element={<EventFinderPage />} />
           <Route path="/study-assistant" element={<StudyAssistantPage />} />
           <Route path="/generate-notes" element={<GenerateNotesPage />} />
+          <Route path="/mock-test" element={<MockTestGeneratorPage />} />
+          <Route path="/explain-concept" element={<ExplainConceptPage />} />
           <Route path="/complaint-support" element={<ComplaintSupportPage />} />
           <Route path="/opportunity-hub" element={<OpportunityHubPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
