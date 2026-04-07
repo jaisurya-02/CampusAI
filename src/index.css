@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  background: #060814;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(166, 225, 255, 0.8), rgba(166, 225, 255, 0));
+  box-shadow: 0 0 18px rgba(135, 212, 255, 0.5);
+  animation-name: floatParticle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes floatParticle {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.9);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate3d(0, -24px, 0) scale(1.2);
+    opacity: 0.9;
+  }
+}
+
+.chat-launcher {
+  overflow: hidden;
+  animation: launcherFloat 3.2s ease-in-out infinite;
+}
+
+.chat-launcher::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(115deg, rgba(34, 211, 238, 0.15), rgba(99, 102, 241, 0.12), rgba(236, 72, 153, 0.12));
+  z-index: 0;
+}
+
+.chat-launcher-ripple {
+  position: absolute;
+  inset: -1px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 245, 255, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  animation: launcherRipple 2.4s ease-out infinite;
+}
+
+.chat-launcher-orb {
+  position: relative;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(140, 234, 255, 0.4), rgba(62, 111, 255, 0.18));
+  box-shadow: 0 0 16px rgba(120, 214, 255, 0.4);
+}
+
+.chat-launcher-orb-core {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(160deg, #67e8f9, #6366f1);
+  animation: orbPulse 1.8s ease-in-out infinite;
+}
+
+.chat-launcher-dot {
+  position: relative;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #4ade80;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+  animation: dotBlink 2.1s ease-in-out infinite;
+}
+
+@keyframes launcherFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes launcherRipple {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.75;
+  }
+  70% {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes orbPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes dotBlink {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+  }
+  50% {
+    opacity: 0.75;
+    box-shadow: 0 0 0 5px rgba(74, 222, 128, 0);
+  }
+}
+
+.thinking-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.thinking-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #a5f3fc;
+  opacity: 0.35;
+  animation: thinkingPulse 1s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.thinking-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes thinkingPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+}
+
+.route-shell {
+  will-change: opacity, transform, filter;
+}
+
+.route-shell.route-enter {
+  animation: routeEnter 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.route-shell.route-exit {
+  animation: routeExit 220ms ease-in forwards;
+}
+
+@keyframes routeEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.995);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes routeExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.998);
+    filter: blur(4px);
+  }
+}
